@@ -10,7 +10,7 @@ COPY pom.xml .
 COPY src ./src
 
 # Build the Spring Boot application
-RUN mvn clean package -DskipTests
+RUN mvn clean package -DskipTests -U
 
 # ---------- Run Stage ----------
 FROM openjdk:17-jdk-slim
