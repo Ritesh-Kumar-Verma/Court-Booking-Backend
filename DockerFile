@@ -1,14 +1,29 @@
-# Use a lightweight Java image
-FROM eclipse-temurin:17-jdk-alpine
-
-# Set working directory inside the container
+# Stage 1: Build the Spring Boot app
+FROM maven:3.9.4-eclipse-temurin-20 AS build
 WORKDIR /app
 
-# Copy the JAR file into the container
-COPY target/Court_Booking-0.0.1-SNAPSHOT.jar app.jar
+# Copy project files
+COPY pom.xml .
+COPY src ./src
 
-# Expose Spring Boot default port
+# Build the JAR without running tests
+RUN mvn clean package -DskipTests
+
+# Stage 2: Run the app
+FROM eclipse-temurin:20-jdk-alpine
+WORKDIR /app
+
+# Copy the built JAR from previous stage
+COPY --from=build /app/target/Court_Booking-0.0.1-SNAPSHOT.jar app.jar
+
+# Create a directory for H2 file-based DB
+RUN mkdir -p /app/data
+
+# Set environment variable for H2 database location
+ENV H2_DB_FILE=/app/data/court_booking
+
+# Expose port 8080
 EXPOSE 8080
 
-# Run the JAR
-ENTRYPOINT ["java", "-jar", "app.jar"]
+# Run the app
+ENTRYPOINT ["java","-jar","/app/app.jar","--spring.datasource.url=jdbc:h2:file:${H2_DB_FILE};DB_CLOSE_ON_EXIT=FALSE;AUTO_SERVER=FALSE"]
