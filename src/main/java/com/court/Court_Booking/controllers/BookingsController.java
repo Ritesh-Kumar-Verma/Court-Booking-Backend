@@ -12,9 +12,11 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 import java.util.Map;
 
-
-@CrossOrigin
 @RestController
+@CrossOrigin(origins = {
+        "http://localhost:5173",
+        "https://ritesh-kumar-verma.github.io/court-booking/"
+})
 public class BookingsController {
 
     @Autowired
