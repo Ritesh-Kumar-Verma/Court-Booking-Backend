@@ -15,7 +15,8 @@ import java.util.Map;
 @RestController
 @CrossOrigin(origins = {
         "http://localhost:5173",
-        "https://ritesh-kumar-verma.github.io/court-booking/"
+        "https://ritesh-kumar-verma.github.io"
+
 })
 public class BookingsController {
 
