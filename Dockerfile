@@ -1,15 +1,30 @@
+# ---------- Build Stage ----------
+FROM maven:3.9.2-eclipse-temurin-17 AS build
+
+WORKDIR /app
+
+# Copy pom.xml first (for dependency caching)
+COPY pom.xml .
+
+# Copy source code
+COPY src ./src
+
+# Build the Spring Boot application
+RUN mvn clean package -DskipTests
+
 # ---------- Run Stage ----------
 FROM openjdk:17-jdk-slim
 
 WORKDIR /app
 
-# Copy the prebuilt JAR
-COPY target/Court_Booking-0.0.1-SNAPSHOT.jar app.jar
+# Copy the built JAR from build stage
+COPY --from=build /app/target/*.jar app.jar
 
-# Create data folder for H2 database
+# Create folder for H2 database persistence
 RUN mkdir -p /app/data
 
+# Expose the application port
 EXPOSE 8080
 
-# Run the Spring Boot app
+# Run the Spring Boot application
 ENTRYPOINT ["java", "-jar", "app.jar"]
